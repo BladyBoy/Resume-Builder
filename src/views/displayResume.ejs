@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - <%= resume.name %></title>
+    <link rel="stylesheet" href="/css/display_styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="resume" id="resume">
+        <header>
+            <h1 class="roboto-bold"><%= resume.name %></h1>
+            <p class="tagline"><%= resume.tagline %></p>
+            <p>Email: <a href="mailto:<%= resume.email %>"><%= resume.email %></a> | Phone: <%= resume.phone %> | DOB: <%= new Date(resume.dob).toLocaleDateString() %></p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- SKILLS Section -->
+                <section class="roboto-light">
+                    <h2>SKILLS</h2>
+                    <!-- PROGRAMMING Subsection -->
+                    <div class="subsection">
+                        <h3>PROGRAMMING</h3>
+                        <ul>
+                            <li><span class="grey-text">Languages:</span> <%= resume.programming_languages %></li>
+                            <li><span class="grey-text">Tools:</span> <%= resume.tools %></li>
+                            <li><span class="grey-text">Frameworks:</span> <%= resume.frameworks %></li>
+                            <li><span class="grey-text">Technologies:</span> <%= resume.technologies %></li>
+                        </ul>
+                    </div>
+                    <!-- OTHERS Subsection -->
+                    <div class="subsection">
+                        <h3>OTHERS</h3>
+                        <ul>
+                            <li><%= resume.otherSkills %></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- EDUCATION Section -->
+                <section>
+                    <h2>EDUCATION</h2>
+                    <p><strong><%= resume.degree_institute %></strong> - <%= resume.degree_course %> (<%= resume.degree_year %>) | Percentage: <%= resume.degree_percentage %>%</p>
+                    <p><strong><%= resume.intermediate_institute %></strong> - <%= resume.intermediate_course %> (<%= resume.intermediate_year %>) | Percentage: <%= resume.intermediate_percentage %>%</p>
+                    <p><strong><%= resume.ssc_school %></strong> - SSC (<%= resume.ssc_year %>) | Percentage: <%= resume.ssc_percentage %>%</p>
+                </section>
+
+                <!-- LANGUAGES KNOWN Section -->
+                <section>
+                    <h2>LANGUAGES KNOWN</h2>
+                    <ul>
+                        <li><%= resume.languages_known %></li>
+                    </ul>
+                </section>
+
+                <!-- LINKS Section -->
+                <section>
+                    <h2>LINKS</h2>
+                    <ul>
+                        <li><a href="<%= resume.github %>">GitHub</a></li>
+                        <li><a href="<%= resume.linkedin %>">LinkedIn</a></li>
+                        <li><a href="<%= resume.youtube %>">YouTube</a></li>
+                    </ul>
+                </section>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- EXPERIENCE Section -->
+                <section>
+                    <h2>EXPERIENCE</h2>
+                    <div class="experience-item">
+                        <p><strong><%= resume.company_name %></strong> | <%= resume.position %> | <%= resume.duration %> | <%= resume.location %></p>
+                        <p>Technologies: <%= resume.technologies_used %></p>
+                    </div>
+                </section>
+
+                <!-- PROJECTS Section -->
+                <section>
+                    <h2>PROJECTS</h2>
+                    <p><strong><%= resume.project_name %></strong></p>
+                    <p class="technologies"><%= resume.project_tech %></p>
+                    <p><%= resume.project_description %></p>
+                </section>
+
+                <!-- ACHIEVEMENTS Section -->
+                <section>
+                    <h2>ACHIEVEMENTS</h2>
+                    <ul>
+                        <li><%= resume.achievements %></li>
+                    </ul>
+                </section>
+
+                <!-- CERTIFICATIONS Section -->
+                <section>
+                    <h2>CERTIFICATIONS</h2>
+                    <ul>
+                        <li><%= resume.certifications %></li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Button -->
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="download-button" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Download PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+    <!-- Triggering the download -->
+    <script>
+        function downloadResume() {
+            const button = document.querySelector("button");
+            button.style.display = "none";
+            
+            const element = document.getElementById('resume');
+            html2pdf().from(element).set({
+                margin:       0.5,
+                filename:     '<%= resume.name %>_Resume.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            }).save().then(() => {
+                button.style.display = "block";
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelector('.download-button').addEventListener('click', downloadResume);
+        });
+    </script>
+</body>
+</html>

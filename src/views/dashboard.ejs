@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard_styles.css">
+</head>
+
+<body>
+    <!-- Sliding Menu for Options -->
+    <div class="menu">
+        <span class="menu-icon" onclick="toggleMenu()">&#8942;</span>
+        <div class="menu-content">
+            <ul>
+                <li><a href="/resume/view">View My Resume</a></li>
+                <li><a href="/account/settings">Account Settings</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+    <header>
+        <h1>Welcome, <%= User.username %>!</h1>
+        <p> The Best Platform designed to help users easily create and customize professional resumes with a user-friendly interface</p>
+    </header>
+    <!-- Main Conten-->
+    <div class="dashboard-container">
+        <main>
+            <section>
+                <h2>Dashboard</h2>
+                <p>Manage your profile and resume below:</p>
+                <!-- Link to the Resume Form -->
+                <a href="/resume/form" class="button">Create or Edit Resume</a>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu-content');
+            menu.classList.toggle('show');
+        }
+    </script>
+</body>
+
+</html>
