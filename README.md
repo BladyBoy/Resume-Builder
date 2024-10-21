@@ -5,16 +5,16 @@ Users can create, edit and manage the resumes. They can also generate multiple t
 TECHNOLOGIES USED:
 1. Frontend:
 
-EJS (Embedded JavaScript) : for server side rendering html pages
-CSS : for stying interface
+  EJS (Embedded JavaScript) : for server side rendering html pages
+  CSS : for stying interface
 
 2. Backend:
 
-nodeJS: for the server side coding
-expressJS: for handling HTTP requests and middlewares and routes
-passportJS: Middleware for handling authentication
-Sequelize ORM: for database operations with PostgreSQL
+  nodeJS: for the server side coding
+  expressJS: for handling HTTP requests and middlewares and routes
+  passportJS: Middleware for handling authentication
+  Sequelize ORM: for database operations with PostgreSQL
 
 3. DataBase:
 
-PostgreSQL: Relational DB for storing user data and resumes
+  PostgreSQL: Relational DB for storing user data and resumes
