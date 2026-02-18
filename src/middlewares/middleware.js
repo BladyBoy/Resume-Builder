@@ -11,7 +11,12 @@ module.exports = (app) => {
         secret: process.env.SESSION_SECRET || 'secret_key', 
         resave: false,
         saveUninitialized: false,
-        cookie: { secure: process.env.NODE_ENV === 'production' } 
+        cookie: {
+            secure: true,        // always true on Render (HTTPS)
+            httpOnly: true,
+            sameSite: 'lax'
+        }
+
     }));
 
     // Initialize passport for authentication
