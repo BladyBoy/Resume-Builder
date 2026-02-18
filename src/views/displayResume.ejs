@@ -9,7 +9,20 @@
     
     <style>
         body { font-family: 'Roboto', sans-serif; -webkit-print-color-adjust: exact; background-color: #f4f4f4; }
-        .resume { max-width: 210mm; margin: 0 auto; background-color: white; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); min-height: 297mm; }
+        
+        /* Desktop Resume Style */
+        .resume { 
+            max-width: 210mm; 
+            width: 210mm; /* Enforce A4 width */
+            margin: 0 auto; 
+            background-color: white; 
+            padding: 20px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            min-height: 297mm; 
+            transform-origin: top center;
+        }
+
+        /* Standard Resume CSS */
         .resume header { text-align: center; margin-bottom: 20px; }
         .resume header h1 { font-size: 50px; font-weight: 700; margin-bottom: 5px; line-height: 1.2; }
         .resume .tagline { font-style: italic; font-size: 18px; margin-top: -10px; color: black; }
@@ -26,154 +39,195 @@
         .resume a { color: #007bff; text-decoration: none; }
         .roboto-light { font-weight: 300; }
         .roboto-bold { font-weight: 700; }
+        
+        /* Button Styles */
         .download-btn { text-align: center; margin-top: 20px; margin-bottom: 40px; }
         button { background-color: #2563eb; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* MOBILE SPECIFIC STYLES - "Fit to Screen" Logic */
+        @media (max-width: 768px) {
+            body {
+                background-color: #333; /* Dark background for contrast */
+                height: 100vh;
+                width: 100vw;
+                overflow: hidden; /* Disable scrolling */
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Container to center the scaled resume */
+            #resume-wrapper {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                overflow: hidden;
+            }
+
+            .download-btn {
+                position: fixed;
+                bottom: 20px;
+                left: 0;
+                width: 100%;
+                z-index: 100;
+                margin: 0;
+            }
+            
+            button {
+                box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="resume" class="resume">
-        <header>
-            <h1 class="roboto-bold"><%= resume.name %></h1>
-            <p class="tagline"><%= resume.tagline %></p>
-            <p>
-                Email: <a href="mailto:<%= resume.email %>"><%= resume.email %></a> | 
-                Phone: <%= resume.phone %> | 
-                Loc: <%= resume.location %>
-            </p>
-        </header>
+    <div id="resume-wrapper">
+        <div id="resume" class="resume">
+            <header>
+                <h1 class="roboto-bold"><%= resume.name %></h1>
+                <p class="tagline"><%= resume.tagline %></p>
+                <p>
+                    Email: <a href="mailto:<%= resume.email %>"><%= resume.email %></a> | 
+                    Phone: <%= resume.phone %> | 
+                    Loc: <%= resume.location %>
+                </p>
+            </header>
 
-        <div class="main-content">
-            <div class="left-column">
-                <section class="roboto-light">
-                    <h2>SKILLS</h2>
-                    <div class="subsection">
-                        <h3>PROGRAMMING</h3>
-                        <ul>
-                            <li><span class="grey-text">Languages:</span> <%= resume.programming_languages %></li>
-                            <li><span class="grey-text">Tools:</span> <%= resume.tools %></li>
-                            <li><span class="grey-text">Frameworks:</span> <%= resume.frameworks %></li>
-                            <li><span class="grey-text">Technologies:</span> <%= resume.technologies %></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="subsection">
-                        <h3>OTHERS</h3>
+            <div class="main-content">
+                <div class="left-column">
+                    <section class="roboto-light">
+                        <h2>SKILLS</h2>
+                        <div class="subsection">
+                            <h3>PROGRAMMING</h3>
+                            <ul>
+                                <li><span class="grey-text">Languages:</span> <%= resume.programming_languages %></li>
+                                <li><span class="grey-text">Tools:</span> <%= resume.tools %></li>
+                                <li><span class="grey-text">Frameworks:</span> <%= resume.frameworks %></li>
+                                <li><span class="grey-text">Technologies:</span> <%= resume.technologies %></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="subsection">
+                            <h3>OTHERS</h3>
+                            <ul>
+                                <% 
+                                let otherSkills = [];
+                                try { otherSkills = JSON.parse(resume.otherSkills || '[]'); if(!Array.isArray(otherSkills)) throw new Error(); } 
+                                catch(e) { otherSkills = resume.otherSkills ? [resume.otherSkills] : []; }
+                                %>
+                                <% otherSkills.forEach(function(skill) { %>
+                                    <li><%= skill %></li>
+                                <% }); %>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>EDUCATION</h2>
+                        <p><strong><%= resume.degree_institute %></strong> - <%= resume.degree_course %> (<%= resume.degree_year %>) | Percentage: <%= resume.degree_percentage %>%</p>
+                        
+                        <% if (resume.intermediate_institute) { %>
+                            <p><strong><%= resume.intermediate_institute %></strong> - <%= resume.intermediate_course %> (<%= resume.intermediate_year %>) | Percentage: <%= resume.intermediate_percentage %>%</p>
+                        <% } %>
+
+                        <% if (resume.ssc_school) { %>
+                            <p><strong><%= resume.ssc_school %></strong> - SSC (<%= resume.ssc_year %>) | Percentage: <%= resume.ssc_percentage %>%</p>
+                        <% } %>
+                    </section>
+
+                    <section>
+                        <h2>LANGUAGES KNOWN</h2>
                         <ul>
                             <% 
-                            let otherSkills = [];
-                            try { otherSkills = JSON.parse(resume.otherSkills || '[]'); if(!Array.isArray(otherSkills)) throw new Error(); } 
-                            catch(e) { otherSkills = resume.otherSkills ? [resume.otherSkills] : []; }
+                            let langs = [];
+                            try { langs = JSON.parse(resume.languages_known || '[]'); if(!Array.isArray(langs)) throw new Error(); } 
+                            catch(e) { langs = resume.languages_known ? [resume.languages_known] : []; }
                             %>
-                            <% otherSkills.forEach(function(skill) { %>
-                                <li><%= skill %></li>
+                            <% langs.forEach(function(l) { %> <li><%= l %></li> <% }); %>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2>LINKS</h2>
+                        <ul>
+                            <% 
+                            let links = [];
+                            try { links = JSON.parse(resume.links || '[]'); if(!Array.isArray(links)) throw new Error(); } 
+                            catch(e) { links = [{platform: 'Link', url: resume.links}]; }
+                            %>
+                            <% links.forEach(function(link) { %>
+                                <% if(link.url && link.url.trim() !== '') { %>
+                                    <li><a href="<%= link.url %>" target="_blank"><%= link.platform || 'Link' %></a></li>
+                                <% } %>
                             <% }); %>
                         </ul>
-                    </div>
-                </section>
+                    </section>
+                </div>
 
-                <section>
-                    <h2>EDUCATION</h2>
-                    <p><strong><%= resume.degree_institute %></strong> - <%= resume.degree_course %> (<%= resume.degree_year %>) | Percentage: <%= resume.degree_percentage %>%</p>
-                    
-                    <% if (resume.intermediate_institute) { %>
-                        <p><strong><%= resume.intermediate_institute %></strong> - <%= resume.intermediate_course %> (<%= resume.intermediate_year %>) | Percentage: <%= resume.intermediate_percentage %>%</p>
+                <div class="right-column">
+                    <section>
+                        <h2>EXPERIENCE</h2>
+                        <div class="experience-item">
+                            <p><strong><%= resume.company_name %></strong> | <%= resume.position %> | <%= resume.duration %> | <%= resume.location %></p>
+                            <p>Technologies: <%= resume.technologies_used %></p>
+                        </div>
+
+                        <% if (resume.company2_name) { %>
+                        <div class="experience-item" style="margin-top: 15px;">
+                            <p><strong><%= resume.company2_name %></strong> | <%= resume.position2 %> | <%= resume.duration2 %> | <%= resume.location2 %></p>
+                            <p>Technologies: <%= resume.technologies_used2 %></p>
+                        </div>
+                        <% } %>
+                    </section>
+
+                    <section>
+                        <h2>PROJECTS</h2>
+                        <div style="margin-bottom: 15px;">
+                            <p><strong><%= resume.project_name %></strong></p>
+                            <p class="technologies"><%= resume.project_tech %></p>
+                            <p><%= resume.project_description %></p>
+                        </div>
+
+                        <% if (resume.project2_name) { %>
+                        <div>
+                            <p><strong><%= resume.project2_name %></strong></p>
+                            <p class="technologies"><%= resume.project2_tech %></p>
+                            <p><%= resume.project2_description %></p>
+                        </div>
+                        <% } %>
+                    </section>
+
+                    <% 
+                    let achs = [];
+                    try { achs = JSON.parse(resume.achievements || '[]'); if(!Array.isArray(achs)) throw new Error(); } 
+                    catch(e) { achs = resume.achievements ? [resume.achievements] : []; }
+                    %>
+                    <% if (achs.length > 0) { %>
+                    <section>
+                        <h2>ACHIEVEMENTS</h2>
+                        <ul>
+                            <% achs.forEach(function(item) { %> <li><%= item %></li> <% }); %>
+                        </ul>
+                    </section>
                     <% } %>
 
-                    <% if (resume.ssc_school) { %>
-                        <p><strong><%= resume.ssc_school %></strong> - SSC (<%= resume.ssc_year %>) | Percentage: <%= resume.ssc_percentage %>%</p>
+                    <% 
+                    let certs = [];
+                    try { certs = JSON.parse(resume.certifications || '[]'); if(!Array.isArray(certs)) throw new Error(); } 
+                    catch(e) { certs = resume.certifications ? [resume.certifications] : []; }
+                    %>
+                    <% if (certs.length > 0) { %>
+                    <section>
+                        <h2>CERTIFICATIONS</h2>
+                        <ul>
+                            <% certs.forEach(function(item) { %> <li><%= item %></li> <% }); %>
+                        </ul>
+                    </section>
                     <% } %>
-                </section>
-
-                <section>
-                    <h2>LANGUAGES KNOWN</h2>
-                    <ul>
-                        <% 
-                        let langs = [];
-                        try { langs = JSON.parse(resume.languages_known || '[]'); if(!Array.isArray(langs)) throw new Error(); } 
-                        catch(e) { langs = resume.languages_known ? [resume.languages_known] : []; }
-                        %>
-                        <% langs.forEach(function(l) { %> <li><%= l %></li> <% }); %>
-                    </ul>
-                </section>
-
-                <section>
-                    <h2>LINKS</h2>
-                    <ul>
-                        <% 
-                        let links = [];
-                        try { links = JSON.parse(resume.links || '[]'); if(!Array.isArray(links)) throw new Error(); } 
-                        catch(e) { links = [{platform: 'Link', url: resume.links}]; }
-                        %>
-                        <% links.forEach(function(link) { %>
-                            <% if(link.url && link.url.trim() !== '') { %>
-                                <li><a href="<%= link.url %>" target="_blank"><%= link.platform || 'Link' %></a></li>
-                            <% } %>
-                        <% }); %>
-                    </ul>
-                </section>
-            </div>
-
-            <div class="right-column">
-                <section>
-                    <h2>EXPERIENCE</h2>
-                    <div class="experience-item">
-                        <p><strong><%= resume.company_name %></strong> | <%= resume.position %> | <%= resume.duration %> | <%= resume.location %></p>
-                        <p>Technologies: <%= resume.technologies_used %></p>
-                    </div>
-
-                    <% if (resume.company2_name) { %>
-                    <div class="experience-item" style="margin-top: 15px;">
-                        <p><strong><%= resume.company2_name %></strong> | <%= resume.position2 %> | <%= resume.duration2 %> | <%= resume.location2 %></p>
-                        <p>Technologies: <%= resume.technologies_used2 %></p>
-                    </div>
-                    <% } %>
-                </section>
-
-                <section>
-                    <h2>PROJECTS</h2>
-                    <div style="margin-bottom: 15px;">
-                        <p><strong><%= resume.project_name %></strong></p>
-                        <p class="technologies"><%= resume.project_tech %></p>
-                        <p><%= resume.project_description %></p>
-                    </div>
-
-                    <% if (resume.project2_name) { %>
-                    <div>
-                        <p><strong><%= resume.project2_name %></strong></p>
-                        <p class="technologies"><%= resume.project2_tech %></p>
-                        <p><%= resume.project2_description %></p>
-                    </div>
-                    <% } %>
-                </section>
-
-                <% 
-                let achs = [];
-                try { achs = JSON.parse(resume.achievements || '[]'); if(!Array.isArray(achs)) throw new Error(); } 
-                catch(e) { achs = resume.achievements ? [resume.achievements] : []; }
-                %>
-                <% if (achs.length > 0) { %>
-                <section>
-                    <h2>ACHIEVEMENTS</h2>
-                    <ul>
-                        <% achs.forEach(function(item) { %> <li><%= item %></li> <% }); %>
-                    </ul>
-                </section>
-                <% } %>
-
-                <% 
-                let certs = [];
-                try { certs = JSON.parse(resume.certifications || '[]'); if(!Array.isArray(certs)) throw new Error(); } 
-                catch(e) { certs = resume.certifications ? [resume.certifications] : []; }
-                %>
-                <% if (certs.length > 0) { %>
-                <section>
-                    <h2>CERTIFICATIONS</h2>
-                    <ul>
-                        <% certs.forEach(function(item) { %> <li><%= item %></li> <% }); %>
-                    </ul>
-                </section>
-                <% } %>
+                </div>
             </div>
         </div>
     </div>
@@ -185,11 +239,45 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
     <script>
+        // --- MOBILE SCALING LOGIC ---
+        function fitResumeToScreen() {
+            // Only run on mobile screens
+            if (window.innerWidth < 768) {
+                const resume = document.getElementById('resume');
+                
+                // Define A4 Paper dimensions in Pixels (approx at 96 DPI)
+                const resumeWidth = 794; // 210mm
+                const resumeHeight = 1123; // 297mm
+                
+                // Calculate scale factor based on Window Width
+                // We multiply by 0.95 to leave a small margin on the sides
+                const scaleX = (window.innerWidth / resumeWidth) * 0.95;
+                
+                // Optional: If you want to fit HEIGHT too (no scrolling at all), uncomment this:
+                const scaleY = (window.innerHeight / resumeHeight) * 0.85; // 0.85 to leave room for button
+                const finalScale = Math.min(scaleX, scaleY); // Pick the smaller scale to fit both
+                
+                // Apply Scale
+                resume.style.transform = `scale(${finalScale})`;
+                resume.style.transformOrigin = 'center center'; // Center the zoom
+            }
+        }
+
+        // Run on load and resize
+        window.addEventListener('load', fitResumeToScreen);
+        window.addEventListener('resize', fitResumeToScreen);
+
+        // --- DOWNLOAD LOGIC ---
         function downloadResume() {
             const button = document.querySelector(".download-btn");
             button.style.display = "none";
-            const element = document.getElementById('resume');
-            html2pdf().from(element).set({
+            
+            // Temporarily remove transform for clean PDF generation
+            const resume = document.getElementById('resume');
+            const originalTransform = resume.style.transform;
+            resume.style.transform = 'none';
+
+            html2pdf().from(resume).set({
                 margin: 0,
                 filename: '<%= resume.name %>_Resume.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
@@ -197,6 +285,8 @@
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             }).save().then(() => {
                 button.style.display = "block";
+                // Restore Mobile Zoom
+                resume.style.transform = originalTransform;
             });
         }
     </script>

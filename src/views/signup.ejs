@@ -11,25 +11,26 @@
             background-image: url('/assets/image-1.jpg'); 
             background-size: cover;
             background-position: center;
+            background-attachment: fixed; /* Ensures background stays still while scrolling on mobile */
             font-family: 'Open Sans', sans-serif;
         }
         .bg-fallback { background-color: #1a202c; }
     </style>
 </head>
-<body class="h-screen w-full flex items-center justify-center lg:justify-end bg-fallback overflow-hidden">
+<body class="min-h-screen w-full flex items-center justify-center lg:justify-end bg-fallback relative py-10 md:py-0">
 
-    <div class="absolute inset-0 bg-black bg-opacity-40 z-0"></div>
+    <div class="absolute inset-0 bg-black bg-opacity-50 z-0"></div>
 
-    <div class="relative z-10 w-full max-w-lg px-4 lg:mr-20">
+    <div class="relative z-10 w-full max-w-lg px-6 lg:mr-20">
         
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-white drop-shadow-md">Resume Builder</h1>
-            <p class="text-gray-200 mt-2 text-lg">Create your account to get started</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-white drop-shadow-md">Resume Builder</h1>
+            <p class="text-gray-200 mt-2 text-base md:text-lg">Create your account to get started</p>
         </div>
 
-        <div class="bg-gray-900 bg-opacity-90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl border border-gray-700">
+        <div class="bg-gray-900 bg-opacity-90 backdrop-blur-md p-6 md:p-10 rounded-2xl shadow-2xl border border-gray-700">
             
-            <h2 class="text-3xl font-bold text-white mb-2 text-center">Get Started</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-2 text-center">Get Started</h2>
             <p class="text-gray-400 text-center mb-8">It's free and easy</p>
 
             <% if (errorMsg) { %>
@@ -42,30 +43,30 @@
                 <div>
                     <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Username</label>
                     <input type="text" name="username" placeholder="Choose a username" required 
-                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                        class="w-full p-3 md:p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
                 </div>
 
                 <div>
                     <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Email</label>
                     <input type="email" name="email" placeholder="name@example.com" required 
-                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                        class="w-full p-3 md:p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
                 </div>
 
                 <div>
                     <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Password</label>
                     <input type="password" name="password" placeholder="Create a password" required 
-                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                        class="w-full p-3 md:p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
                 </div>
 
                 <button type="submit" 
-                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg transition transform hover:scale-[1.02] duration-200">
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 md:py-4 rounded-lg shadow-lg transition transform hover:scale-[1.01] active:scale-95 duration-200">
                     Create Account
                 </button>
             </form>
 
             <div class="mt-8 text-center">
-                <p class="text-gray-400">Already have an account? 
-                    <a href="/login" class="text-green-400 hover:text-green-300 font-bold hover:underline">Login</a>
+                <p class="text-gray-400 text-sm md:text-base">Already have an account? 
+                    <a href="/login" class="text-green-400 hover:text-green-300 font-bold hover:underline ml-1">Login</a>
                 </p>
             </div>
         </div>
