@@ -1,25 +1,33 @@
-const User = require('../models/userModel');
+const { User } = require('../models');
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
 
-        // Dublicate email handling
+        // Duplicate email handling
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-            return res.render('signup', { errorMsg: 'Email already in use. Please Try using another Email' });
+            return res.render('signup', { errorMsg: 'Email already in use. Please try using another Email.' });
         }
 
-        // Hashing  password
+        // Hashing password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        //creating user records
-        await User.create({ username, email, password: hashedPassword });
+        // Creating user record
+        const newUser = await User.create({ username, email, password: hashedPassword });
 
-        res.redirect('/dashboard'); // Redirecting to dashboard after successful signup
+        req.login(newUser, (err) => {
+            if (err) {
+                console.error('Auto-login error:', err);
+                return next(err);
+            }
+            return res.redirect('/dashboard');
+        });
+
     } catch (error) {
+        console.error('Signup Error:', error);
         res.render('signup', { errorMsg: 'Error creating account. Please try again.' });
     }
 };
@@ -31,7 +39,6 @@ exports.login = (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            console.log('Login failed:', info.message);
             return res.render('login', { errorMsg: info.message });
         }
 
@@ -40,17 +47,17 @@ exports.login = (req, res, next) => {
                 console.error('Error logging in:', err);
                 return next(err);
             }
-            console.log('Login successful:', user.username);
-            res.redirect('/dashboard'); // Redirect to dashboard after successful login
+            // Explicitly save session before redirecting
+            req.session.save(() => {
+                res.redirect('/dashboard');
+            });
         });
     })(req, res, next);
 };
 
-exports.logout = (req, res) => {
+exports.logout = (req, res, next) => {
     req.logout((err) => {
-        if (err) {
-            console.error('Error logging out:', err);
-        }
-        res.redirect('/'); // Redirect to login page after logout
+        if (err) { return next(err); }
+        res.redirect('/');
     });
 };

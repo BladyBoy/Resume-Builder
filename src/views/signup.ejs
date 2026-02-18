@@ -4,27 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup - Resume Builder</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('/assets/image-1.jpg'); 
+            background-size: cover;
+            background-position: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .bg-fallback { background-color: #1a202c; }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Resume Builder</h1>
+<body class="h-screen w-full flex items-center justify-center lg:justify-end bg-fallback overflow-hidden">
+
+    <div class="absolute inset-0 bg-black bg-opacity-40 z-0"></div>
+
+    <div class="relative z-10 w-full max-w-lg px-4 lg:mr-20">
         
-    </header>
-    <!-- Main container -->
-    <div class="container">
-        <h2>Signup</h2>
-        <p>Create an account</p>
-        <% if (errorMsg) { %>
-            <p class="error"><%= errorMsg %></p>
-        <% } %>
-        <form action="/signup" method="post">
-            <input type="text" name="username" placeholder="Username" required><br>
-            <input type="email" name="email" placeholder="Email" required><br>
-            <input type="password" name="password" placeholder="Password" required><br>
-            <button type="submit">Signup</button>
-        </form>
-        <p>Already have an account? <a href="/login">Login</a></p>
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white drop-shadow-md">Resume Builder</h1>
+            <p class="text-gray-200 mt-2 text-lg">Create your account to get started</p>
+        </div>
+
+        <div class="bg-gray-900 bg-opacity-90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl border border-gray-700">
+            
+            <h2 class="text-3xl font-bold text-white mb-2 text-center">Get Started</h2>
+            <p class="text-gray-400 text-center mb-8">It's free and easy</p>
+
+            <% if (errorMsg) { %>
+                <div class="bg-red-500 bg-opacity-20 border border-red-500 text-red-100 p-3 rounded mb-6 text-center text-sm">
+                    <%= errorMsg %>
+                </div>
+            <% } %>
+
+            <form action="/signup" method="post" class="space-y-5">
+                <div>
+                    <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Username</label>
+                    <input type="text" name="username" placeholder="Choose a username" required 
+                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Email</label>
+                    <input type="email" name="email" placeholder="name@example.com" required 
+                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Password</label>
+                    <input type="password" name="password" placeholder="Create a password" required 
+                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-lg transition transform hover:scale-[1.02] duration-200">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-gray-400">Already have an account? 
+                    <a href="/login" class="text-green-400 hover:text-green-300 font-bold hover:underline">Login</a>
+                </p>
+            </div>
+        </div>
     </div>
+
 </body>
 </html>

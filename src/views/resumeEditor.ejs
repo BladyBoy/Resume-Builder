@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Resume</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        .resume-preview-area { font-family: 'Roboto', sans-serif; color: black; }
+        .resume { max-width: 900px; margin: 0 auto; background-color: white; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); min-height: 297mm; }
+        .resume header { text-align: center; margin-bottom: 20px; }
+        .resume header h1 { font-size: 50px; font-weight: 700; margin-bottom: 5px; line-height: 1.2; }
+        .resume .tagline { font-style: italic; font-size: 18px; margin-top: -10px; color: black; }
+        .resume p { font-size: 16px; margin: 5px 0; }
+        .resume .main-content { display: flex; justify-content: space-between; }
+        .resume .left-column, .resume .right-column { width: 48%; }
+        .resume section { margin-bottom: 20px; }
+        .resume h2 { font-size: 24px; color: #b8b8b8; border-bottom: 2px solid #ddd; padding-bottom: 5px; margin-bottom: 20px; font-weight: bold; }
+        .resume .subsection h3 { color: black; font-size: 18px; margin-top: 10px; font-weight: bold; }
+        .resume ul { list-style-type: disc; margin-left: 40px; padding-left: 0; }
+        .resume ul li { font-size: 16px; margin-bottom: 5px; }
+        .resume .grey-text { color: grey; }
+        .resume .technologies { color: darkgrey; }
+        .resume a { color: #007bff; text-decoration: none; }
+        .roboto-light { font-weight: 300; }
+        .roboto-bold { font-weight: 700; }
+        .hidden-section { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex overflow-hidden">
+
+    <div class="w-[52%] h-full overflow-y-auto z-20 relative p-4">
+        <div class="bg-white border border-gray-300 rounded-2xl shadow-xl">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Editor</h2>
+                    <a href="/dashboard" class="text-sm text-blue-600 hover:underline">&larr; Dashboard</a>
+                </div>
+
+                <form action="/resume/submit" method="post" class="space-y-6" onsubmit="prepareAllData()">
+                    <input type="hidden" name="id" value="<%= resume ? resume.id : '' %>">
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Personal</h3>
+                        <input type="text" name="name" placeholder="Full Name" class="w-full p-2 border rounded" oninput="updatePreview('name', this.value)" value="<%= resume ? resume.name : '' %>" required>
+                        <input type="text" name="tagline" placeholder="Tagline" class="w-full p-2 border rounded" oninput="updatePreview('tagline', this.value)" value="<%= resume ? resume.tagline : '' %>" required>
+                        <input type="email" name="email" placeholder="Email" class="w-full p-2 border rounded" oninput="updatePreview('email', this.value)" value="<%= resume ? resume.email : '' %>" required>
+                        <input type="text" name="phone" placeholder="Phone" class="w-full p-2 border rounded" oninput="updatePreview('phone', this.value)" value="<%= resume ? resume.phone : '' %>" required>
+                        <input type="date" name="dob" class="w-full p-2 border rounded" value="<%= resume ? resume.dob : '' %>">
+                        <input type="text" name="location" placeholder="Location" class="w-full p-2 border rounded" oninput="updatePreview('location', this.value)" value="<%= resume ? resume.location : '' %>" required>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Skills</h3>
+                        <textarea name="programming_languages" placeholder="Languages (JS, Python)" class="w-full p-2 border rounded" oninput="updatePreview('programming_languages', this.value)"><%= resume ? resume.programming_languages : '' %></textarea>
+                        <textarea name="tools" placeholder="Tools" class="w-full p-2 border rounded" oninput="updatePreview('tools', this.value)"><%= resume ? resume.tools : '' %></textarea>
+                        <textarea name="frameworks" placeholder="Frameworks" class="w-full p-2 border rounded" oninput="updatePreview('frameworks', this.value)"><%= resume ? resume.frameworks : '' %></textarea>
+                        <textarea name="technologies" placeholder="Technologies" class="w-full p-2 border rounded" oninput="updatePreview('technologies', this.value)"><%= resume ? resume.technologies : '' %></textarea>
+                        
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Other Skills</label>
+                            <div id="list-otherSkills" class="space-y-2 mt-2"></div>
+                            <button type="button" onclick="addSimpleItem('otherSkills')" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Skill</button>
+                            <input type="hidden" name="otherSkills" id="input-otherSkills" value='<%= resume && resume.otherSkills ? resume.otherSkills : "[]" %>'>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Education</h3>
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Degree</label>
+                            <input type="text" name="degree_institute" placeholder="Institute" class="w-full p-2 border rounded mt-1" oninput="updatePreview('degree_institute', this.value)" value="<%= resume ? resume.degree_institute : '' %>" required>
+                            <input type="text" name="degree_course" placeholder="Course" class="w-full p-2 border rounded mt-1" oninput="updatePreview('degree_course', this.value)" value="<%= resume ? resume.degree_course : '' %>" required>
+                            <input type="text" name="degree_year" placeholder="Year" class="w-full p-2 border rounded mt-1" oninput="updatePreview('degree_year', this.value)" value="<%= resume ? resume.degree_year : '' %>" required>
+                            <input type="text" name="degree_percentage" placeholder="%" class="w-full p-2 border rounded mt-1" oninput="updatePreview('degree_percentage', this.value)" value="<%= resume ? resume.degree_percentage : '' %>" required>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Intermediate (Optional)</label>
+                            <input type="text" name="intermediate_institute" placeholder="College" class="w-full p-2 border rounded mt-1" oninput="updatePreview('intermediate_institute', this.value)" value="<%= resume ? resume.intermediate_institute : '' %>">
+                            <input type="text" name="intermediate_course" placeholder="Course" class="w-full p-2 border rounded mt-1" oninput="updatePreview('intermediate_course', this.value)" value="<%= resume ? resume.intermediate_course : '' %>">
+                            <input type="text" name="intermediate_year" placeholder="Year" class="w-full p-2 border rounded mt-1" oninput="updatePreview('intermediate_year', this.value)" value="<%= resume ? resume.intermediate_year : '' %>">
+                            <input type="text" name="intermediate_percentage" placeholder="%" class="w-full p-2 border rounded mt-1" oninput="updatePreview('intermediate_percentage', this.value)" value="<%= resume ? resume.intermediate_percentage : '' %>">
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">SSC (Optional)</label>
+                            <input type="text" name="ssc_school" placeholder="School" class="w-full p-2 border rounded mt-1" oninput="updatePreview('ssc_school', this.value)" value="<%= resume ? resume.ssc_school : '' %>">
+                            <input type="text" name="ssc_year" placeholder="Year" class="w-full p-2 border rounded mt-1" oninput="updatePreview('ssc_year', this.value)" value="<%= resume ? resume.ssc_year : '' %>">
+                            <input type="text" name="ssc_percentage" placeholder="%" class="w-full p-2 border rounded mt-1" oninput="updatePreview('ssc_percentage', this.value)" value="<%= resume ? resume.ssc_percentage : '' %>">
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Experience</h3>
+                        
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Experience 1</label>
+                            <input type="text" name="company_name" placeholder="Company" class="w-full p-2 border rounded mt-1" oninput="updatePreview('company_name', this.value)" value="<%= resume ? resume.company_name : '' %>">
+                            <input type="text" name="position" placeholder="Position" class="w-full p-2 border rounded mt-1" oninput="updatePreview('position', this.value)" value="<%= resume ? resume.position : '' %>">
+                            <input type="text" name="duration" placeholder="Duration" class="w-full p-2 border rounded mt-1" oninput="updatePreview('duration', this.value)" value="<%= resume ? resume.duration : '' %>">
+                            <textarea name="technologies_used" placeholder="Tech Used" class="w-full p-2 border rounded mt-1" oninput="updatePreview('technologies_used', this.value)"><%= resume ? resume.technologies_used : '' %></textarea>
+                        </div>
+
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Experience 2 (Optional)</label>
+                            <input type="text" name="company2_name" placeholder="Company" class="w-full p-2 border rounded mt-1" oninput="updatePreview('company2_name', this.value)" value="<%= resume ? resume.company2_name : '' %>">
+                            <input type="text" name="position2" placeholder="Position" class="w-full p-2 border rounded mt-1" oninput="updatePreview('position2', this.value)" value="<%= resume ? resume.position2 : '' %>">
+                            <input type="text" name="duration2" placeholder="Duration" class="w-full p-2 border rounded mt-1" oninput="updatePreview('duration2', this.value)" value="<%= resume ? resume.duration2 : '' %>">
+                            <textarea name="technologies_used2" placeholder="Tech Used" class="w-full p-2 border rounded mt-1" oninput="updatePreview('technologies_used2', this.value)"><%= resume ? resume.technologies_used2 : '' %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Projects</h3>
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Project 1</label>
+                            <input type="text" name="project_name" placeholder="Name" class="w-full p-2 border rounded mt-1" oninput="updatePreview('project_name', this.value)" value="<%= resume ? resume.project_name : '' %>">
+                            <textarea name="project_tech" placeholder="Tech" class="w-full p-2 border rounded mt-1" oninput="updatePreview('project_tech', this.value)"><%= resume ? resume.project_tech : '' %></textarea>
+                            <textarea name="project_description" placeholder="Desc" rows="4" class="w-full p-2 border rounded mt-1" oninput="updatePreview('project_description', this.value)"><%= resume ? resume.project_description : '' %></textarea>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Project 2 (Optional)</label>
+                            <input type="text" name="project2_name" placeholder="Name" class="w-full p-2 border rounded mt-1" oninput="updatePreview('project2_name', this.value)" value="<%= resume ? resume.project2_name : '' %>">
+                            <textarea name="project2_tech" placeholder="Tech" class="w-full p-2 border rounded mt-1" oninput="updatePreview('project2_tech', this.value)"><%= resume ? resume.project2_tech : '' %></textarea>
+                            <textarea name="project2_description" placeholder="Desc" rows="4" class="w-full p-2 border rounded mt-1" oninput="updatePreview('project2_description', this.value)"><%= resume ? resume.project2_description : '' %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Extras</h3>
+                        
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Languages Known</label>
+                            <div id="list-languages_known" class="space-y-2 mt-2"></div>
+                            <button type="button" onclick="addSimpleItem('languages_known')" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Language</button>
+                            <input type="hidden" name="languages_known" id="input-languages_known" value='<%= resume && resume.languages_known ? resume.languages_known : "[]" %>'>
+                        </div>
+
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Achievements</label>
+                            <div id="list-achievements" class="space-y-2 mt-2"></div>
+                            <button type="button" onclick="addSimpleItem('achievements')" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Achievement</button>
+                            <input type="hidden" name="achievements" id="input-achievements" value='<%= resume && resume.achievements ? resume.achievements : "[]" %>'>
+                        </div>
+
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Certifications</label>
+                            <div id="list-certifications" class="space-y-2 mt-2"></div>
+                            <button type="button" onclick="addSimpleItem('certifications')" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Certification</button>
+                            <input type="hidden" name="certifications" id="input-certifications" value='<%= resume && resume.certifications ? resume.certifications : "[]" %>'>
+                        </div>
+
+                        <div class="bg-gray-50 p-2 rounded border">
+                            <label class="text-xs font-bold">Links</label>
+                            <div id="links-container" class="space-y-2 mt-2"></div>
+                            <button type="button" onclick="addLinkRow()" class="mt-2 text-sm text-blue-600 hover:underline">+ Add Link</button>
+                            <input type="hidden" name="links" id="links-hidden" value='<%= resume && resume.links ? resume.links : "[]" %>'>
+                        </div>
+                    </div>
+
+                    <div class="sticky bottom-0 bg-white pt-4 border-t">
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700 shadow-md">Save & Download</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-[48%] bg-gray-600 h-full overflow-y-auto p-4 flex justify-center resume-preview-area">
+        <div id="resume-content" class="resume transform scale-90 origin-top">
+            <header>
+                <h1 id="preview-name" class="roboto-bold"><%= resume ? resume.name : 'Your Name' %></h1>
+                <p id="preview-tagline" class="tagline"><%= resume ? resume.tagline : 'Your Tagline' %></p>
+                <p>
+                    Email: <a href="#" id="preview-email"><%= resume ? resume.email : 'email@example.com' %></a> | 
+                    Phone: <span id="preview-phone"><%= resume ? resume.phone : '123-456-7890' %></span> | 
+                    Loc: <span id="preview-location"><%= resume ? resume.location : 'Location' %></span>
+                </p>
+            </header>
+
+            <div class="main-content">
+                <div class="left-column">
+                    <section class="roboto-light">
+                        <h2>SKILLS</h2>
+                        <div class="subsection">
+                            <h3>PROGRAMMING</h3>
+                            <ul>
+                                <li><span class="grey-text">Languages:</span> <span id="preview-programming_languages"><%= resume ? resume.programming_languages : '' %></span></li>
+                                <li><span class="grey-text">Tools:</span> <span id="preview-tools"><%= resume ? resume.tools : '' %></span></li>
+                                <li><span class="grey-text">Frameworks:</span> <span id="preview-frameworks"><%= resume ? resume.frameworks : '' %></span></li>
+                                <li><span class="grey-text">Technologies:</span> <span id="preview-technologies"><%= resume ? resume.technologies : '' %></span></li>
+                            </ul>
+                        </div>
+                        <div class="subsection">
+                            <h3>OTHERS</h3>
+                            <ul id="preview-list-otherSkills">
+                                </ul>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>EDUCATION</h2>
+                        <p>
+                            <strong><span id="preview-degree_institute"><%= resume ? resume.degree_institute : 'Institute' %></span></strong> - 
+                            <span id="preview-degree_course"><%= resume ? resume.degree_course : 'Degree' %></span> 
+                            (<span id="preview-degree_year"><%= resume ? resume.degree_year : 'Year' %></span>) | 
+                            Percentage: <span id="preview-degree_percentage"><%= resume ? resume.degree_percentage : '%' %></span>
+                        </p>
+                        <div id="section-intermediate" class="<%= (resume && resume.intermediate_institute) ? '' : 'hidden-section' %>">
+                            <p>
+                                <strong><span id="preview-intermediate_institute"><%= resume ? resume.intermediate_institute : '' %></span></strong> - 
+                                <span id="preview-intermediate_course"><%= resume ? resume.intermediate_course : '' %></span> 
+                                (<span id="preview-intermediate_year"><%= resume ? resume.intermediate_year : '' %></span>) | 
+                                Percentage: <span id="preview-intermediate_percentage"><%= resume ? resume.intermediate_percentage : '' %></span>
+                            </p>
+                        </div>
+                        <div id="section-ssc" class="<%= (resume && resume.ssc_school) ? '' : 'hidden-section' %>">
+                            <p>
+                                <strong><span id="preview-ssc_school"><%= resume ? resume.ssc_school : '' %></span></strong> - 
+                                SSC (<span id="preview-ssc_year"><%= resume ? resume.ssc_year : '' %></span>) | 
+                                Percentage: <span id="preview-ssc_percentage"><%= resume ? resume.ssc_percentage : '' %></span>
+                            </p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>LANGUAGES KNOWN</h2>
+                        <ul id="preview-list-languages_known"></ul>
+                    </section>
+
+                    <section>
+                        <h2>LINKS</h2>
+                        <ul id="preview-links-list"></ul>
+                    </section>
+                </div>
+
+                <div class="right-column">
+                    <section>
+                        <h2>EXPERIENCE</h2>
+                        <div class="experience-item">
+                            <p>
+                                <strong><span id="preview-company_name"><%= resume ? resume.company_name : 'Company' %></span></strong> | 
+                                <span id="preview-position"><%= resume ? resume.position : 'Position' %></span> | 
+                                <span id="preview-duration"><%= resume ? resume.duration : 'Duration' %></span> | 
+                                <span id="preview-location-exp"><%= resume ? resume.location : 'Location' %></span>
+                            </p>
+                            <p>Technologies: <span id="preview-technologies_used"><%= resume ? resume.technologies_used : '' %></span></p>
+                        </div>
+
+                        <div id="section-exp2" class="experience-item <%= (resume && resume.company2_name) ? '' : 'hidden-section' %>">
+                            <p>
+                                <strong><span id="preview-company2_name"><%= resume ? resume.company2_name : '' %></span></strong> | 
+                                <span id="preview-position2"><%= resume ? resume.position2 : '' %></span> | 
+                                <span id="preview-duration2"><%= resume ? resume.duration2 : '' %></span> | 
+                                <span id="preview-location2"><%= resume ? resume.location2 : '' %></span>
+                            </p>
+                            <p>Technologies: <span id="preview-technologies_used2"><%= resume ? resume.technologies_used2 : '' %></span></p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>PROJECTS</h2>
+                        <div class="mb-4">
+                            <p><strong><span id="preview-project_name"><%= resume ? resume.project_name : 'Project Name' %></span></strong></p>
+                            <p class="technologies"><span id="preview-project_tech"><%= resume ? resume.project_tech : '' %></span></p>
+                            <p><span id="preview-project_description"><%= resume ? resume.project_description : '' %></span></p>
+                        </div>
+                        <div id="section-project2" class="mb-4 <%= (resume && resume.project2_name) ? '' : 'hidden-section' %>">
+                            <p><strong><span id="preview-project2_name"><%= resume ? resume.project2_name : '' %></span></strong></p>
+                            <p class="technologies"><span id="preview-project2_tech"><%= resume ? resume.project2_tech : '' %></span></p>
+                            <p><span id="preview-project2_description"><%= resume ? resume.project2_description : '' %></span></p>
+                        </div>
+                    </section>
+
+                    <section id="section-achievements">
+                        <h2>ACHIEVEMENTS</h2>
+                        <ul id="preview-list-achievements"></ul>
+                    </section>
+
+                    <section id="section-certifications">
+                        <h2>CERTIFICATIONS</h2>
+                        <ul id="preview-list-certifications"></ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GENERIC LIST  (For Languages, Certs, Skills, Achievements) ---
+        function initSimpleList(fieldId) {
+            let items = [];
+            try {
+                const raw = document.getElementById('input-' + fieldId).value;
+                items = JSON.parse(raw);
+                if(!Array.isArray(items)) items = []; 
+            } catch(e) { 
+                // if value is plain text, make it one item
+                const val = document.getElementById('input-' + fieldId).value;
+                if(val && val.trim()) items = [val];
+            }
+            
+            items.forEach(txt => addSimpleItemRow(fieldId, txt));
+            updateSimpleListPreview(fieldId); 
+        }
+
+        function addSimpleItem(fieldId) {
+            addSimpleItemRow(fieldId, '');
+        }
+
+        function addSimpleItemRow(fieldId, value) {
+            const container = document.getElementById('list-' + fieldId);
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center';
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Item...';
+            input.className = 'p-2 border rounded text-sm w-full';
+            input.value = value;
+            input.oninput = () => updateSimpleListJson(fieldId);
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.innerText = '✕';
+            delBtn.className = 'text-red-500 font-bold px-2';
+            delBtn.onclick = () => { div.remove(); updateSimpleListJson(fieldId); };
+
+            div.appendChild(input);
+            div.appendChild(delBtn);
+            container.appendChild(div);
+        }
+
+        function updateSimpleListJson(fieldId) {
+            const container = document.getElementById('list-' + fieldId);
+            const rows = container.querySelectorAll('input');
+            const data = [];
+            rows.forEach(r => { if(r.value.trim()) data.push(r.value); });
+            
+            document.getElementById('input-' + fieldId).value = JSON.stringify(data);
+            updateSimpleListPreview(fieldId, data);
+        }
+
+        function updateSimpleListPreview(fieldId, dataArr) {
+            const ul = document.getElementById('preview-list-' + fieldId);
+            const section = document.getElementById('section-' + fieldId); // for hiding whole section
+            if(!ul) return;
+
+            const data = dataArr || JSON.parse(document.getElementById('input-' + fieldId).value || '[]');
+            ul.innerHTML = '';
+
+            data.forEach(txt => {
+                const li = document.createElement('li');
+                li.innerText = txt;
+                ul.appendChild(li);
+            });
+
+            // Toggle visibility of section if it exists
+            if(section) {
+                if(data.length > 0) section.classList.remove('hidden-section');
+                else section.classList.add('hidden-section');
+            }
+        }
+
+        // Initialize Lists
+        window.addEventListener('load', () => {
+            initSimpleList('languages_known');
+            initSimpleList('achievements');
+            initSimpleList('certifications');
+            initSimpleList('otherSkills');
+        });
+
+
+        // --- LINKS ---
+        const platforms = ['GitHub', 'LinkedIn', 'YouTube', 'LeetCode', 'Portfolio', 'Twitter', 'Other'];
+        
+        let currentLinks = [];
+        try {
+            const raw = document.getElementById('links-hidden').value;
+            currentLinks = JSON.parse(raw);
+            if(!Array.isArray(currentLinks)) currentLinks = [];
+        } catch(e) { console.log("Legacy links"); }
+
+        const linkContainer = document.getElementById('links-container');
+        currentLinks.forEach(link => addLinkRow(link.platform, link.url));
+        updateLinksPreview();
+
+        function addLinkRow(platform = 'GitHub', url = '') {
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center';
+            
+            const select = document.createElement('select');
+            select.className = 'p-2 border rounded text-sm w-1/3';
+            platforms.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.innerText = p;
+                if(p === platform) opt.selected = true;
+                select.appendChild(opt);
+            });
+            select.onchange = updateLinksJson;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'URL';
+            input.className = 'p-2 border rounded text-sm w-full';
+            input.value = url;
+            input.oninput = updateLinksJson;
+
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.innerText = '✕';
+            delBtn.className = 'text-red-500 font-bold px-2';
+            delBtn.onclick = () => { div.remove(); updateLinksJson(); };
+
+            div.appendChild(select);
+            div.appendChild(input);
+            div.appendChild(delBtn);
+            linkContainer.appendChild(div);
+            updateLinksJson();
+        }
+
+        function updateLinksJson() {
+            const rows = linkContainer.querySelectorAll('div');
+            const data = [];
+            rows.forEach(row => {
+                const select = row.querySelector('select');
+                const input = row.querySelector('input');
+                if (input.value.trim()) {
+                    data.push({ platform: select.value, url: input.value });
+                }
+            });
+            document.getElementById('links-hidden').value = JSON.stringify(data);
+            updateLinksPreview(data);
+        }
+
+        function updateLinksPreview(dataLinks) {
+            const list = document.getElementById('preview-links-list');
+            if(!list) return;
+            list.innerHTML = '';
+            const data = dataLinks || JSON.parse(document.getElementById('links-hidden').value || '[]');
+            data.forEach(link => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${link.url}" target="_blank">${link.platform}</a>`;
+                list.appendChild(li);
+            });
+        }
+
+        function prepareAllData() {
+            updateLinksJson();
+            updateSimpleListJson('languages_known');
+            updateSimpleListJson('achievements');
+            updateSimpleListJson('certifications');
+            updateSimpleListJson('otherSkills');
+        }
+
+
+        // --- STANDARD FIELDS ---
+        function updatePreview(fieldId, value) {
+            const previewElement = document.getElementById('preview-' + fieldId);
+            if (fieldId === 'location') {
+                const loc2 = document.getElementById('preview-location-exp');
+                if (loc2) loc2.innerText = value;
+                const loc3 = document.getElementById('preview-location2');
+                if (loc3) loc3.innerText = value;
+            }
+            if (previewElement) previewElement.innerText = value ? value : '';
+
+            // Hiding logic for optional sections
+            const sectionMap = {
+                'intermediate_institute': 'section-intermediate',
+                'ssc_school': 'section-ssc',
+                'project2_name': 'section-project2',
+                'company2_name': 'section-exp2'
+            };
+            if (sectionMap[fieldId]) {
+                const section = document.getElementById(sectionMap[fieldId]);
+                if (section) {
+                    if (value && value.trim() !== '') section.classList.remove('hidden-section');
+                    else section.classList.add('hidden-section');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

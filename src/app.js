@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
-const sequelize = require('./config/db'); 
+const { sequelize } = require('./models');
 const resumeRoutes = require('./routes/resumeRoutes'); 
 const authRoutes = require('./routes/authRoutes'); 
 const setupMiddlewares = require('./middlewares/middleware'); 
@@ -21,7 +21,6 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Applying middlewares using separate middleware file
 setupMiddlewares(app);
 
 
@@ -30,10 +29,10 @@ app.use('/', authRoutes); // Routes for authentication
 app.use('/resume', resumeRoutes); // Routes for resume management
 
 // Syncing the models with the database
-sequelize.sync()
+sequelize.sync({ alter: true }) 
     .then(() => console.log('Database synced successfully'))
     .catch(err => console.error('Error syncing database:', err));
-
+    
 // Starting the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

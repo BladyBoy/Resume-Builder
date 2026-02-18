@@ -1,47 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-    <link rel="stylesheet" href="/css/dashboard_styles.css">
+    <title>Dashboard | Resume Builder</title>
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto', sans-serif; }
+    </style>
 </head>
+<body class="bg-gray-100 font-sans antialiased">
 
-<body>
-    <!-- Sliding Menu for Options -->
-    <div class="menu">
-        <span class="menu-icon" onclick="toggleMenu()">&#8942;</span>
-        <div class="menu-content">
-            <ul>
-                <li><a href="/resume/view">View My Resume</a></li>
-                <li><a href="/account/settings">Account Settings</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-[#003366] text-white flex flex-col shadow-2xl z-20 hidden md:flex">
+            <div class="h-16 flex items-center justify-center border-b border-blue-900 shadow-sm">
+                <h1 class="text-xl font-bold tracking-wider uppercase">Resume<span class="text-blue-300">Builder</span></h1>
+            </div>
+
+            <div class="p-6 border-b border-blue-900 bg-[#002b55]">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-lg font-bold">
+                        <%= User.username.charAt(0).toUpperCase() %>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm"><%= User.username %></p>
+                        <p class="text-xs text-blue-300">Free Account</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 bg-blue-800 rounded-lg text-white shadow transition transform hover:scale-105">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="/resume/create" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-blue-800 hover:text-white rounded-lg transition">
+                    <span>📝</span> Create Resume
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-blue-800 hover:text-white rounded-lg transition">
+                    <span>⚙️</span> Settings
+                </a>
+            </nav>
+
+            <div class="p-4">
+                <a href="/logout" class="flex items-center justify-center gap-2 w-full py-2 bg-red-600 hover:bg-red-700 rounded-lg transition shadow-md">
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col h-full overflow-y-auto">
+            
+            <header class="md:hidden h-16 bg-white shadow-sm flex items-center justify-between px-4 z-10">
+                <h1 class="text-lg font-bold text-[#003366]">ResumeBuilder</h1>
+                <a href="/logout" class="text-sm text-red-600 font-bold">Logout</a>
+            </header>
+
+            <main class="flex-1 p-6 md:p-10">
+                
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Welcome back, <%= User.username %>! 👋</h2>
+                        <p class="text-gray-500 mt-1">Here is what's happening with your resumes today.</p>
+                    </div>
+                    <a href="/resume/create" class="bg-[#003366] hover:bg-[#002244] text-white px-6 py-3 rounded-lg font-bold shadow-lg transition transform hover:-translate-y-1 flex items-center gap-2">
+                        <span>+</span> Create New
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl">📄</div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Total Resumes</p>
+                            <p class="text-2xl font-bold text-gray-800"><%= resumes.length %></p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl">⬇️</div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Downloads</p>
+                            <p class="text-2xl font-bold text-gray-800">Unlimited</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl">⭐</div>
+                        <div>
+                            <p class="text-gray-500 text-sm">Plan</p>
+                            <p class="text-2xl font-bold text-gray-800">Pro (Free)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-6 border-l-4 border-blue-600 pl-3">Your Resumes</h3>
+
+                <% if (resumes.length === 0) { %>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-10 text-center">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">📂</div>
+                        <h4 class="text-xl font-bold text-gray-700">No resumes found</h4>
+                        <p class="text-gray-500 mt-2 mb-6">You haven't created any resumes yet. Start building your professional profile now!</p>
+                        <a href="/resume/create" class="text-blue-600 font-bold hover:underline">Create your first resume &rarr;</a>
+                    </div>
+                <% } else { %>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <% resumes.forEach(function(resume) { %>
+                            <div class="bg-white rounded-xl shadow-md border border-gray-100 hover:shadow-xl transition duration-300 overflow-hidden group">
+                                <div class="h-32 bg-gray-50 border-b flex flex-col items-center justify-center group-hover:bg-blue-50 transition">
+                                    <h4 class="text-lg font-bold text-gray-800"><%= resume.name %></h4>
+                                    <p class="text-xs text-gray-500"><%= resume.tagline || 'No Tagline' %></p>
+                                </div>
+                                
+                                <div class="p-5">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">Active</span>
+                                        <span class="text-xs text-gray-400"><%= new Date(resume.updatedAt).toLocaleDateString() %></span>
+                                    </div>
+                                    
+                                    <div class="flex gap-2">
+                                        <a href="/resume/edit/<%= resume.id %>" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-center text-sm font-bold transition">
+                                            ✏️ Edit
+                                        </a>
+                                        <a href="/resume/view/<%= resume.id %>" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-center text-sm font-bold transition shadow-md">
+                                            👁️ View
+                                        </a>
+                                        <form action="/resume/delete/<%= resume.id %>" method="POST" onsubmit="return confirmDelete('<%= resume.name %>')">
+                                            <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded text-center text-sm font-bold transition border border-red-200" title="Delete">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </main>
         </div>
-    </div>
-    <header>
-        <h1>Welcome, <%= User.username %>!</h1>
-        <p> The Best Platform designed to help users easily create and customize professional resumes with a user-friendly interface</p>
-    </header>
-    <!-- Main Conten-->
-    <div class="dashboard-container">
-        <main>
-            <section>
-                <h2>Dashboard</h2>
-                <p>Manage your profile and resume below:</p>
-                <!-- Link to the Resume Form -->
-                <a href="/resume/form" class="button">Create or Edit Resume</a>
-            </section>
-        </main>
     </div>
 
     <script>
-        function toggleMenu() {
-            const menu = document.querySelector('.menu-content');
-            menu.classList.toggle('show');
+        function confirmDelete(resumeName) {
+            return confirm(`Are you sure you want to delete the resume for "${resumeName}"? This action cannot be undone.`);
         }
     </script>
-</body>
 
+</body>
 </html>

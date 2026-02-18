@@ -4,28 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Resume Builder</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link href="/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('/assets/image-1.jpg'); 
+            background-size: cover;
+            background-position: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+        /* Fallback if image fails */
+        .bg-fallback { background-color: #1a202c; }
+    </style>
 </head>
-<body>
-    <div class="login-wrapper">
-        <header>
-            <h1>Resume Builder</h1>
+<body class="h-screen w-full flex items-center justify-center lg:justify-end bg-fallback overflow-hidden">
+
+    <div class="absolute inset-0 bg-black bg-opacity-40 z-0"></div>
+
+    <div class="relative z-10 w-full max-w-lg px-4 lg:mr-20">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white drop-shadow-md">Resume Builder</h1>
+            <p class="text-gray-200 mt-2 text-lg">Build your professional future today</p>
+        </div>
+
+        <div class="bg-gray-900 bg-opacity-90 backdrop-blur-sm p-10 rounded-2xl shadow-2xl border border-gray-700">
             
-        </header>
-        <!-- Main container -->
-        <div class="container">
+            <h2 class="text-3xl font-bold text-white mb-2 text-center">Welcome Back</h2>
+            <p class="text-gray-400 text-center mb-8">Login to manage your resumes</p>
+
             <% if (errorMsg) { %>
-                <p class="error"><%= errorMsg %></p>
+                <div class="bg-red-500 bg-opacity-20 border border-red-500 text-red-100 p-3 rounded mb-6 text-center text-sm">
+                    <%= errorMsg %>
+                </div>
             <% } %>
-            <h2>Login</h2>
-            <p>Log in to create and manage your resume</p>
-            <form action="/login" method="post">
-                <input type="text" name="usernameOrEmail" placeholder="Username or Email" required><br>
-                <input type="password" name="password" placeholder="Password" required><br>
-                <button type="submit">Login</button>
+
+            <form action="/login" method="post" class="space-y-6">
+                <div>
+                    <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Username or Email</label>
+                    <input type="text" name="usernameOrEmail" placeholder="e.g. john@example.com" required 
+                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-gray-300 text-sm font-bold mb-2 ml-1">Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required 
+                        class="w-full p-4 rounded-lg bg-gray-800 border border-gray-600 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg transition transform hover:scale-[1.02] duration-200">
+                    Login
+                </button>
             </form>
-            <p>Don't have an account? <a href="/signup">Sign up</a></p>
+
+            <div class="mt-8 text-center">
+                <p class="text-gray-400">Don't have an account? 
+                    <a href="/signup" class="text-blue-400 hover:text-blue-300 font-bold hover:underline">Sign up</a>
+                </p>
+            </div>
         </div>
     </div>
+
 </body>
 </html>

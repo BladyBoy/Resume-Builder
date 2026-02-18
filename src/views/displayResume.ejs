@@ -4,26 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume - <%= resume.name %></title>
-    <link rel="stylesheet" href="/css/display_styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="/css/output.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Roboto', sans-serif; -webkit-print-color-adjust: exact; background-color: #f4f4f4; }
+        .resume { max-width: 210mm; margin: 0 auto; background-color: white; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); min-height: 297mm; }
+        .resume header { text-align: center; margin-bottom: 20px; }
+        .resume header h1 { font-size: 50px; font-weight: 700; margin-bottom: 5px; line-height: 1.2; }
+        .resume .tagline { font-style: italic; font-size: 18px; margin-top: -10px; color: black; }
+        .resume p { font-size: 16px; margin: 5px 0; }
+        .resume .main-content { display: flex; justify-content: space-between; }
+        .resume .left-column, .resume .right-column { width: 48%; }
+        .resume section { margin-bottom: 20px; }
+        .resume h2 { font-size: 24px; color: #b8b8b8; border-bottom: 2px solid #ddd; padding-bottom: 5px; margin-bottom: 20px; font-weight: bold; }
+        .resume .subsection h3 { color: black; font-size: 18px; margin-top: 10px; font-weight: bold; }
+        .resume ul { list-style-type: disc; margin-left: 40px; padding-left: 0; }
+        .resume ul li { font-size: 16px; margin-bottom: 5px; }
+        .resume .grey-text { color: grey; }
+        .resume .technologies { color: darkgrey; }
+        .resume a { color: #007bff; text-decoration: none; }
+        .roboto-light { font-weight: 300; }
+        .roboto-bold { font-weight: 700; }
+        .download-btn { text-align: center; margin-top: 20px; margin-bottom: 40px; }
+        button { background-color: #2563eb; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <div class="resume" id="resume">
+
+    <div id="resume" class="resume">
         <header>
             <h1 class="roboto-bold"><%= resume.name %></h1>
             <p class="tagline"><%= resume.tagline %></p>
-            <p>Email: <a href="mailto:<%= resume.email %>"><%= resume.email %></a> | Phone: <%= resume.phone %> | DOB: <%= new Date(resume.dob).toLocaleDateString() %></p>
+            <p>
+                Email: <a href="mailto:<%= resume.email %>"><%= resume.email %></a> | 
+                Phone: <%= resume.phone %> | 
+                Loc: <%= resume.location %>
+            </p>
         </header>
 
         <div class="main-content">
-            <!-- Left Column -->
             <div class="left-column">
-                <!-- SKILLS Section -->
                 <section class="roboto-light">
                     <h2>SKILLS</h2>
-                    <!-- PROGRAMMING Subsection -->
                     <div class="subsection">
                         <h3>PROGRAMMING</h3>
                         <ul>
@@ -33,108 +56,149 @@
                             <li><span class="grey-text">Technologies:</span> <%= resume.technologies %></li>
                         </ul>
                     </div>
-                    <!-- OTHERS Subsection -->
+                    
                     <div class="subsection">
                         <h3>OTHERS</h3>
                         <ul>
-                            <li><%= resume.otherSkills %></li>
+                            <% 
+                            let otherSkills = [];
+                            try { otherSkills = JSON.parse(resume.otherSkills || '[]'); if(!Array.isArray(otherSkills)) throw new Error(); } 
+                            catch(e) { otherSkills = resume.otherSkills ? [resume.otherSkills] : []; }
+                            %>
+                            <% otherSkills.forEach(function(skill) { %>
+                                <li><%= skill %></li>
+                            <% }); %>
                         </ul>
                     </div>
                 </section>
 
-                <!-- EDUCATION Section -->
                 <section>
                     <h2>EDUCATION</h2>
                     <p><strong><%= resume.degree_institute %></strong> - <%= resume.degree_course %> (<%= resume.degree_year %>) | Percentage: <%= resume.degree_percentage %>%</p>
-                    <p><strong><%= resume.intermediate_institute %></strong> - <%= resume.intermediate_course %> (<%= resume.intermediate_year %>) | Percentage: <%= resume.intermediate_percentage %>%</p>
-                    <p><strong><%= resume.ssc_school %></strong> - SSC (<%= resume.ssc_year %>) | Percentage: <%= resume.ssc_percentage %>%</p>
+                    
+                    <% if (resume.intermediate_institute) { %>
+                        <p><strong><%= resume.intermediate_institute %></strong> - <%= resume.intermediate_course %> (<%= resume.intermediate_year %>) | Percentage: <%= resume.intermediate_percentage %>%</p>
+                    <% } %>
+
+                    <% if (resume.ssc_school) { %>
+                        <p><strong><%= resume.ssc_school %></strong> - SSC (<%= resume.ssc_year %>) | Percentage: <%= resume.ssc_percentage %>%</p>
+                    <% } %>
                 </section>
 
-                <!-- LANGUAGES KNOWN Section -->
                 <section>
                     <h2>LANGUAGES KNOWN</h2>
                     <ul>
-                        <li><%= resume.languages_known %></li>
+                        <% 
+                        let langs = [];
+                        try { langs = JSON.parse(resume.languages_known || '[]'); if(!Array.isArray(langs)) throw new Error(); } 
+                        catch(e) { langs = resume.languages_known ? [resume.languages_known] : []; }
+                        %>
+                        <% langs.forEach(function(l) { %> <li><%= l %></li> <% }); %>
                     </ul>
                 </section>
 
-                <!-- LINKS Section -->
                 <section>
                     <h2>LINKS</h2>
                     <ul>
-                        <li><a href="<%= resume.github %>">GitHub</a></li>
-                        <li><a href="<%= resume.linkedin %>">LinkedIn</a></li>
-                        <li><a href="<%= resume.youtube %>">YouTube</a></li>
+                        <% 
+                        let links = [];
+                        try { links = JSON.parse(resume.links || '[]'); if(!Array.isArray(links)) throw new Error(); } 
+                        catch(e) { links = [{platform: 'Link', url: resume.links}]; }
+                        %>
+                        <% links.forEach(function(link) { %>
+                            <% if(link.url && link.url.trim() !== '') { %>
+                                <li><a href="<%= link.url %>" target="_blank"><%= link.platform || 'Link' %></a></li>
+                            <% } %>
+                        <% }); %>
                     </ul>
                 </section>
             </div>
 
-            <!-- Right Column -->
             <div class="right-column">
-                <!-- EXPERIENCE Section -->
                 <section>
                     <h2>EXPERIENCE</h2>
                     <div class="experience-item">
                         <p><strong><%= resume.company_name %></strong> | <%= resume.position %> | <%= resume.duration %> | <%= resume.location %></p>
                         <p>Technologies: <%= resume.technologies_used %></p>
                     </div>
+
+                    <% if (resume.company2_name) { %>
+                    <div class="experience-item" style="margin-top: 15px;">
+                        <p><strong><%= resume.company2_name %></strong> | <%= resume.position2 %> | <%= resume.duration2 %> | <%= resume.location2 %></p>
+                        <p>Technologies: <%= resume.technologies_used2 %></p>
+                    </div>
+                    <% } %>
                 </section>
 
-                <!-- PROJECTS Section -->
                 <section>
                     <h2>PROJECTS</h2>
-                    <p><strong><%= resume.project_name %></strong></p>
-                    <p class="technologies"><%= resume.project_tech %></p>
-                    <p><%= resume.project_description %></p>
+                    <div style="margin-bottom: 15px;">
+                        <p><strong><%= resume.project_name %></strong></p>
+                        <p class="technologies"><%= resume.project_tech %></p>
+                        <p><%= resume.project_description %></p>
+                    </div>
+
+                    <% if (resume.project2_name) { %>
+                    <div>
+                        <p><strong><%= resume.project2_name %></strong></p>
+                        <p class="technologies"><%= resume.project2_tech %></p>
+                        <p><%= resume.project2_description %></p>
+                    </div>
+                    <% } %>
                 </section>
 
-                <!-- ACHIEVEMENTS Section -->
+                <% 
+                let achs = [];
+                try { achs = JSON.parse(resume.achievements || '[]'); if(!Array.isArray(achs)) throw new Error(); } 
+                catch(e) { achs = resume.achievements ? [resume.achievements] : []; }
+                %>
+                <% if (achs.length > 0) { %>
                 <section>
                     <h2>ACHIEVEMENTS</h2>
                     <ul>
-                        <li><%= resume.achievements %></li>
+                        <% achs.forEach(function(item) { %> <li><%= item %></li> <% }); %>
                     </ul>
                 </section>
+                <% } %>
 
-                <!-- CERTIFICATIONS Section -->
+                <% 
+                let certs = [];
+                try { certs = JSON.parse(resume.certifications || '[]'); if(!Array.isArray(certs)) throw new Error(); } 
+                catch(e) { certs = resume.certifications ? [resume.certifications] : []; }
+                %>
+                <% if (certs.length > 0) { %>
                 <section>
                     <h2>CERTIFICATIONS</h2>
                     <ul>
-                        <li><%= resume.certifications %></li>
+                        <% certs.forEach(function(item) { %> <li><%= item %></li> <% }); %>
                     </ul>
                 </section>
+                <% } %>
             </div>
         </div>
     </div>
 
-    <!-- Download Button -->
-    <div style="text-align: center; margin-top: 20px;">
-        <button class="download-button" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">Download PDF</button>
+    <div class="download-btn">
+        <button onclick="downloadResume()">Download PDF</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
-    <!-- Triggering the download -->
     <script>
         function downloadResume() {
-            const button = document.querySelector("button");
+            const button = document.querySelector(".download-btn");
             button.style.display = "none";
-            
             const element = document.getElementById('resume');
             html2pdf().from(element).set({
-                margin:       0.5,
-                filename:     '<%= resume.name %>_Resume.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                margin: 0,
+                filename: '<%= resume.name %>_Resume.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             }).save().then(() => {
                 button.style.display = "block";
             });
         }
-
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.querySelector('.download-button').addEventListener('click', downloadResume);
-        });
     </script>
 </body>
 </html>

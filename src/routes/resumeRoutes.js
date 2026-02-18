@@ -1,60 +1,102 @@
 const express = require('express');
 const router = express.Router();
-const Resume = require('../models/resumeModel');
+const { Resume } = require('../models'); 
+const isAuthenticated = require('../middlewares/isAuthenticated');
 
-// Rendering to resume form
-router.get('/form', (req, res) => {
-    console.log("Resume form route is working successfully"); 
-    res.render('resumeForm');
+router.use(isAuthenticated);
+
+// CREATE NEW (Renders blank form)
+router.get('/create', (req, res) => {
+    res.render('resumeEditor', { resume: null });
 });
 
-
-// form submission Handling
-router.post('/submit', async (req, res) => {
+// EDIT EXISTING (Renders form with data)
+router.get('/edit/:id', async (req, res) => {
     try {
-        const {
-            name, tagline, email, phone, dob,
-            programming_languages, tools, frameworks, technologies, otherSkills,
-            degree_institute, degree_course, degree_branch, degree_year, degree_percentage,
-            intermediate_institute, intermediate_course, intermediate_year, intermediate_percentage,
-            ssc_school, ssc_year, ssc_percentage,
-            languages_known, company_name, position, duration, location, technologies_used,
-            project_name, project_tech, project_description, achievements, certifications, links
-        } = req.body;
-
-        // Creating new resume entry
-        await Resume.create({
-            name, tagline, email, phone, dob,
-            programming_languages, tools, frameworks, technologies, otherSkills,
-            degree_institute, degree_course, degree_branch, degree_year, degree_percentage,
-            intermediate_institute, intermediate_course, intermediate_year, intermediate_percentage,
-            ssc_school, ssc_year, ssc_percentage,
-            languages_known, company_name, position, duration, location, technologies_used,
-            project_name, project_tech, project_description, achievements, certifications, links
+        const resume = await Resume.findOne({ 
+            where: { 
+                id: req.params.id, 
+                userId: req.user.id 
+            } 
         });
 
-        // Redirecting to the display resume page after creating the new entry
-        res.redirect('/resume/display');
+        if (!resume) {
+            return res.redirect('/dashboard');
+        }
+        
+        res.render('resumeEditor', { resume: resume });
+    } catch (error) {
+        console.error(error);
+        res.redirect('/dashboard');
+    }
+});
+
+// HANDLE SUBMIT (Create or Update)
+router.post('/submit', async (req, res) => {
+    try {
+        const { id, ...formData } = req.body; 
+        
+        if (!formData.dob || formData.dob.trim() === '' || formData.dob === 'Invalid date') {
+            formData.dob = null;
+        }
+
+        const data = { ...formData, userId: req.user.id };
+
+        if (id && id.trim() !== '') {
+            const resume = await Resume.findOne({ where: { id: id, userId: req.user.id } });
+            if (resume) {
+                await resume.update(data);
+                return res.redirect(`/resume/view/${resume.id}`);
+            }
+        } 
+        
+        // --- CREATE NEW ---
+        const newResume = await Resume.create(data);
+        res.redirect(`/resume/view/${newResume.id}`);
+
+    } catch (error) {
+        console.error("❌ Submit Error:", error);
+        res.status(500).send('Internal Server Error: ' + error.message);
+    }
+});
+
+// VIEW RESUME
+router.get('/view/:id', async (req, res) => {
+    try {
+        const resume = await Resume.findOne({ 
+            where: { 
+                id: req.params.id, 
+                userId: req.user.id 
+            } 
+        });
+
+        if (!resume) return res.redirect('/dashboard');
+        
+        res.render('displayResume', { resume });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 });
 
-// Render resume page with data
-router.get('/display', async (req, res) => {
+// DELETE RESUME
+router.post('/delete/:id', async (req, res) => {
     try {
-        // To display the most recently created resume
-        const resume = await Resume.findOne({ order: [['createdAt', 'DESC']] });
+        const resume = await Resume.findOne({ 
+            where: { 
+                id: req.params.id, 
+                userId: req.user.id 
+            } 
+        });
 
-        if (!resume) {
-            return res.status(404).send('No resume found');
+        if (resume) {
+            await resume.destroy();
+            console.log(`✅ Resume ID ${req.params.id} deleted successfully.`);
         }
 
-        // Render the resume page
-        res.render('displayResume', { resume });
+        res.redirect('/dashboard');
     } catch (error) {
-        console.error(error);
+        console.error("❌ Delete Error:", error);
         res.status(500).send('Internal Server Error');
     }
 });
