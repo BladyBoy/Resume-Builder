@@ -6,15 +6,19 @@ TECHNOLOGIES USED:
 1. Frontend:
 
   EJS (Embedded JavaScript) : for server side rendering html pages
-  CSS : for stying interface
+  TailwindCSS : for stying interface
 
 2. Backend:
 
   nodeJS: for the server side coding
   expressJS: for handling HTTP requests and middlewares and routes
   passportJS: Middleware for handling authentication
-  Sequelize ORM: for database operations with PostgreSQL
+  Sequelize ORM: for database operations with 
 
 3. DataBase:
 
   PostgreSQL: Relational DB for storing user data and resumes
+  NeonDB : A serverless open cloud platform for PostgreSQL projects
+
+4. Deployment: 
+  Render: Used to deploy backend applications with free.
