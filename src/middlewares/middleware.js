@@ -6,17 +6,17 @@ const { Op } = require('sequelize');
 const User = require('../models/userModel'); 
 
 module.exports = (app) => {
-    // Session configuration
+    app.set('trust proxy', 1);
+
     app.use(session({
-        secret: process.env.SESSION_SECRET || 'secret_key', 
+        secret: process.env.SESSION_SECRET || 'secret_key',
         resave: false,
         saveUninitialized: false,
         cookie: {
-            secure: true,        // always true on Render (HTTPS)
+            secure: true,
             httpOnly: true,
             sameSite: 'lax'
         }
-
     }));
 
     // Initialize passport for authentication
